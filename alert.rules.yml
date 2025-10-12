@@ -1,0 +1,20 @@
+groups:
+  - name: urlshortenerapi-alerts
+    rules:
+      - alert: HighRequestRate
+        expr: rate(http_requests_total[1m]) > 5
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High request rate on API"
+          description: "api_requests_total rate > 5r/s for 1m. (instance={{ $labels.instance }})"
+
+      - alert: ManyActiveUsers
+        expr: active_users > 50
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Too many active users"
+          description: "active_users > 50 for 1 minute."

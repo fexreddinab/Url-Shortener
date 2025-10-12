@@ -1,0 +1,32 @@
+# Visual Studio / .NET
+.vs/
+bin/
+obj/
+**/bin/
+**/obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+
+# Docker
+**/docker-compose.override.yml
+**/docker-compose.*.yml
+*.env
+
+# Prometheus TSDB and Grafana data volumes (in case you mapped to host dirs)
+/prometheus-data/
+/grafana-data/
+
+# Node modules (if any future frontend)
+node_modules/

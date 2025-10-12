@@ -1,0 +1,54 @@
+services:
+  urlshortenerapi:
+    image: urlshortenerapi
+    build:
+      context: .
+      dockerfile: UrlShortenerApi/Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      # Persist logs or any runtime data the app may write (adjust path if your app writes elsewhere)
+      - urlshortener-data:/app/data
+
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./alert.rules.yml:/etc/prometheus/alert.rules.yml
+      # Persist Prometheus TSDB data so scrape history survives restarts
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - "9090:9090"
+
+  alertmanager:
+    image: prom/alertmanager:latest
+    volumes:
+      - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml
+      # Persist Alertmanager state (alerts, silences)
+      - alertmanager-data:/alertmanager
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+    ports:
+      - "9093:9093"
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      # Persist Grafana database, plugins and dashboards
+      - grafana-data:/var/lib/grafana
+
+volumes:
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
+  alertmanager-data:
+    driver: local
+  urlshortener-data:
+    driver: local
