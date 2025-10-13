@@ -7,8 +7,8 @@ namespace UrlShortenerApi.Controllers
     [Route("{shortCode}")]
     public class RedirectController : ControllerBase
     {
-        private readonly Services.IUrlShortenerService _service;
-        public RedirectController(Services.IUrlShortenerService service) => _service = service;
+        private readonly Services.Abstractions.IUrlShortenerService _service;
+        public RedirectController(Services.Abstractions.IUrlShortenerService service) => _service = service;
 
         [HttpGet]
         public IActionResult RedirectToOriginal(string shortCode)

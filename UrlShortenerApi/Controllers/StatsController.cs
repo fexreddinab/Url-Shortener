@@ -7,8 +7,8 @@ namespace UrlShortenerApi.Controllers
     [Route("api/[controller]")]
     public class StatsController : ControllerBase
     {
-        private readonly Services.IUrlShortenerService _service;
-        public StatsController(Services.IUrlShortenerService service) => _service = service;
+        private readonly Services.Abstractions.IUrlShortenerService _service;
+        public StatsController(Services.Abstractions.IUrlShortenerService service) => _service = service;
 
         [HttpGet("{shortCode}")]
         public IActionResult GetStats(string shortCode)

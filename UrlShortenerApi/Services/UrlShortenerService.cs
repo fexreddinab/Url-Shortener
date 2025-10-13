@@ -1,38 +1,44 @@
+using UrlShortenerApi.Data;
 using UrlShortenerApi.Models;
+using UrlShortenerApi.Services.Abstractions;
 
 namespace UrlShortenerApi.Services
 {
-    public interface IUrlShortenerService
-    {
-        ShortUrl Shorten(string originalUrl);
-        string GetOriginalUrl(string shortCode);
-        ShortUrl GetStats(string shortCode);
-    }
-
     public class UrlShortenerService : IUrlShortenerService
     {
-        // In-memory store for demo
-        private readonly Dictionary<string, ShortUrl> _store = new();
+        private readonly UrlShortenerDbContext _db;
+
+        public UrlShortenerService(UrlShortenerDbContext db)
+        {
+            _db = db;
+        }
+
         public ShortUrl Shorten(string originalUrl)
         {
             var shortCode = Guid.NewGuid().ToString()[..6];
-            var shortUrl = new ShortUrl { ShortCode = shortCode, OriginalUrl = originalUrl, Clicks = 0 };
-            _store[shortCode] = shortUrl;
+            var shortUrl = new ShortUrl
+            {
+                ShortCode = shortCode,
+                OriginalUrl = originalUrl,
+                Clicks = 0
+            };
+            _db.ShortUrls.Add(shortUrl);
+            _db.SaveChanges();
             return shortUrl;
         }
+
         public string GetOriginalUrl(string shortCode)
         {
-            if (_store.TryGetValue(shortCode, out var shortUrl))
-            {
-                shortUrl.Clicks++;
-                return shortUrl.OriginalUrl;
-            }
-            return null;
+            var shortUrl = _db.ShortUrls.FirstOrDefault(x => x.ShortCode == shortCode);
+            if (shortUrl == null) return null;
+            shortUrl.Clicks++;
+            _db.SaveChanges();
+            return shortUrl.OriginalUrl;
         }
+
         public ShortUrl GetStats(string shortCode)
         {
-            _store.TryGetValue(shortCode, out var shortUrl);
-            return shortUrl;
+            return _db.ShortUrls.FirstOrDefault(x => x.ShortCode == shortCode);
         }
     }
 }

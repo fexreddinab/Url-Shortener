@@ -1,15 +1,25 @@
 
 using System;
+using Microsoft.EntityFrameworkCore;
 using Prometheus;
+using UrlShortenerApi.Data;
+
 // Add the correct namespace for IUrlShortenerService and UrlShortenerService
 using UrlShortenerApi.Services;
+using UrlShortenerApi.Services.Abstractions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddSingleton<IUrlShortenerService, UrlShortenerService>();
+
+var connString = builder.Configuration.GetConnectionString("DefaultConnection") 
+                 ?? "Host=postgres;Database=urlshortener;Username=admin;Password=password";
+builder.Services.AddDbContext<UrlShortenerDbContext>(options =>
+    options.UseNpgsql(connString));
+
+builder.Services.AddScoped<IUrlShortenerService, UrlShortenerService>();
 
 var app = builder.Build();
 
