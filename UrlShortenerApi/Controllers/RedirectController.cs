@@ -11,13 +11,13 @@ namespace UrlShortenerApi.Controllers
         public RedirectController(Services.Abstractions.IUrlShortenerService service) => _service = service;
 
         [HttpGet]
-        public IActionResult RedirectToOriginal(string shortCode)
+        public async Task<IActionResult> RedirectToOriginal(string shortCode)
         {
-            var original = _service.GetOriginalUrl(shortCode);
+            var original = await _service.GetOriginalUrlAsync(shortCode);
             if (original == null) return NotFound();
             if (!original.StartsWith("http://") && !original.StartsWith("https://"))
             {
-                original = "http://" + original;
+                original = "https://" + original;
             }
             return Redirect(original);
         }

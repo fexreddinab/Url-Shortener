@@ -11,9 +11,9 @@ namespace UrlShortenerApi.Controllers
         public StatsController(Services.Abstractions.IUrlShortenerService service) => _service = service;
 
         [HttpGet("{shortCode}")]
-        public IActionResult GetStats(string shortCode)
+        public async Task<IActionResult> GetStats(string shortCode)
         {
-            var stats = _service.GetStats(shortCode);
+            var stats = await _service.GetStatsAsync(shortCode);
             if (stats == null) return NotFound();
             return Ok(new { stats.ShortCode, stats.OriginalUrl, stats.Clicks });
         }

@@ -38,7 +38,7 @@ namespace UrlShortenerApi.Controllers
 
             if (string.IsNullOrWhiteSpace(originalUrl)) return BadRequest(new { errors = new { originalUrl = new[] { "The originalUrl field is required." } } });
 
-            var shortUrl = _service.Shorten(originalUrl);
+            var shortUrl = await _service.ShortenAsync(originalUrl);
 
             var scheme = Request.Scheme;          // http
             var host = Request.Host.Value;        // url.shortener:80 və ya localhost:8080

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Prometheus;
 using UrlShortenerApi.Data;
+using StackExchange.Redis;
 
 // Add the correct namespace for IUrlShortenerService and UrlShortenerService
 using UrlShortenerApi.Services;
@@ -18,6 +19,16 @@ var connString = builder.Configuration.GetConnectionString("DefaultConnection")
                  ?? "Host=postgres;Database=urlshortener;Username=admin;Password=password";
 builder.Services.AddDbContext<UrlShortenerDbContext>(options =>
     options.UseNpgsql(connString));
+
+var redisConfig = builder.Configuration.GetSection("Redis");
+var options = ConfigurationOptions.Parse(redisConfig.GetValue<string>("ConnectionString") ?? "redis:6379");
+
+options.AbortOnConnectFail = redisConfig.GetValue<bool>("AbortOnConnectFail", false);
+options.ConnectRetry = redisConfig.GetValue<int>("ConnectRetry", 5);
+options.ConnectTimeout = redisConfig.GetValue<int>("ConnectTimeout", 5000);
+options.SyncTimeout = redisConfig.GetValue<int>("SyncTimeout", 5000);
+
+builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(options));
 
 builder.Services.AddScoped<IUrlShortenerService, UrlShortenerService>();
 

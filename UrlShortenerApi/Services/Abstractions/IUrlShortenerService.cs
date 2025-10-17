@@ -4,7 +4,7 @@ namespace UrlShortenerApi.Services.Abstractions;
 
 public interface IUrlShortenerService
 {
-    ShortUrl Shorten(string originalUrl);
-    string GetOriginalUrl(string shortCode);
-    ShortUrl GetStats(string shortCode);
+    Task<ShortUrl> ShortenAsync(string originalUrl);
+    Task<string?> GetOriginalUrlAsync(string shortCode);
+    Task<ShortUrl> GetStatsAsync(string shortCode);
 }

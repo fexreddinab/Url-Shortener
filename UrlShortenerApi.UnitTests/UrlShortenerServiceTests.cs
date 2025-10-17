@@ -10,7 +10,7 @@ namespace UrlShortenerApi.UnitTests
         public void Shorten_ShouldReturnShortUrl()
         {
             var service = new UrlShortenerService();
-            var result = service.Shorten("https://example.com");
+            var result = service.ShortenAsync("https://example.com");
             Assert.NotNull(result);
             Assert.Equal("https://example.com", result.OriginalUrl);
             Assert.False(string.IsNullOrEmpty(result.ShortCode));
@@ -20,7 +20,7 @@ namespace UrlShortenerApi.UnitTests
         public void GetOriginalUrl_ShouldReturnOriginalUrl()
         {
             var service = new UrlShortenerService();
-            var shortUrl = service.Shorten("https://example.com");
+            var shortUrl = service.ShortenAsync("https://example.com");
             var original = service.GetOriginalUrl(shortUrl.ShortCode);
             Assert.Equal("https://example.com", original);
         }
@@ -29,7 +29,7 @@ namespace UrlShortenerApi.UnitTests
         public void GetStats_ShouldReturnStats()
         {
             var service = new UrlShortenerService();
-            var shortUrl = service.Shorten("https://example.com");
+            var shortUrl = service.ShortenAsync("https://example.com");
             service.GetOriginalUrl(shortUrl.ShortCode);
             var stats = service.GetStats(shortUrl.ShortCode);
             Assert.Equal(1, stats.Clicks);

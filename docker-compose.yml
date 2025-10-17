@@ -2,14 +2,15 @@ services:
   urlshortenerapi:
     image: urlshortenerapi
     hostname: api                    # konteyner içində görünəcək hostname (api.url.shortener)
-    domainname: url.shortener 
+    domainname: url-shortener.local 
     build:
       context: .
       dockerfile: UrlShortenerApi/Dockerfile
     depends_on:
       - postgres
-    ports:
-      - "80:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: "http://+:8080"
     volumes:
       # Persist logs or any runtime data the app may write (adjust path if your app writes elsewhere)
       - urlshortener-data:/app/data
@@ -18,7 +19,7 @@ services:
   prometheus:
     image: prom/prometheus:latest
     hostname: prometheus                    # konteyner içində görünəcək hostname (api.url.shortener)
-    domainname: url.shortener 
+    domainname: url-shortener.local
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
       - ./alert.rules.yml:/etc/prometheus/alert.rules.yml
@@ -32,7 +33,7 @@ services:
   alertmanager:
     image: prom/alertmanager:latest
     hostname: alertmanager                    # konteyner içində görünəcək hostname (api.url.shortener)
-    domainname: url.shortener 
+    domainname: url-shortener.local
     volumes:
       - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml
       # Persist Alertmanager state (alerts, silences)
@@ -45,12 +46,11 @@ services:
   grafana:
     image: grafana/grafana:latest
     hostname: grafana                    # konteyner içində görünəcək hostname (api.url.shortener)
-    domainname: url.shortener 
+    domainname: url-shortener.local
     ports:
       - "3000:3000"
     volumes:
       - ./grafana/provisioning:/etc/grafana/provisioning
-      # Persist Grafana database, plugins and dashboards
       - grafana-data:/var/lib/grafana
 
   postgres:
@@ -64,6 +64,26 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
 
+  nginx:
+    image: nginx:stable
+    container_name: nginx
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - urlshortenerapi
+
+  redis:
+    image: redis:7
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
 
 volumes:
   prometheus-data:
@@ -75,4 +95,6 @@ volumes:
   urlshortener-data:
     driver: local
   postgres-data:
+    driver: local
+  redis-data:
     driver: local
